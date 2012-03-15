@@ -273,6 +273,77 @@ cordova.PluginManager = (function (webworksPluginManager) {
 
             }
         },
+        fileAPI = {
+            execute: function (webWorksResult, action, args, win, fail) {
+                if (!(args.length >= 1)) {
+                    return {"status" : 9, "message" : "Notification action - " + action + " arguments not found"};
+
+                }
+
+                //Unpack and map the args
+                var fileName = args[0];
+                switch (action) {
+                    case 'readAsText':
+                        var encoding = args[1];
+
+                        blackberry.io.file.readFile(fileName, function(fullPath, blobData){
+                                var data = blackberry.utils.blobToString(blobData, encoding);
+                                win(data);
+                            },
+                            false);
+
+                        return retAsyncCall;
+                    case 'readAsDataURL':
+                        var encoding = 'BASE64';
+
+                        blackberry.io.file.readFile(fileName, function(fullPath, stringData){
+                                var data = blackberry.utils.stringToBlob(stringData, encoding);
+                                win(data);
+                            },
+                            false);
+                        return retAsyncCall;
+                    case 'write':
+                        var data = args[1];
+                        var position = args[2]; //Not used
+                        blackberry.io.file.saveFile(fileName,data);
+                        win();
+                        return retAsyncCall;
+                }
+                return retInvalidAction;
+
+            }
+        },
+        accelerationAPI = {
+            execute: function (webWorksResult, action, args, win, fail) {
+                switch (action) {
+                    case 'getAcceleration':
+                     var accEvent =   window.addEventListener('devicemotion', function(event) {
+
+                            var ax =  event.accelerationIncludingGravity.x;
+                            var ay =  event.accelerationIncludingGravity.y;
+                            var az =  event.accelerationIncludingGravity.z;
+                            win(new Acceleration(ax,ay,az));
+                            window.removeEventListener(accEvent);
+                        }, true);
+
+                        return retAsyncCall;
+                    case 'setTimeout':
+                        if(args[0]){
+                        accelerationTimeout = args[0];
+                        }
+                        return retAsyncCall;
+                    case 'getTimeout':
+                                if(accelerationTimeout){
+                                    win(accelerationTimeout);
+                                }else{
+                                    fail();
+                                }
+                        return retAsyncCall;
+                }
+                return retInvalidAction;
+
+            }
+        },
 
         plugins = {
             'Camera' : cameraAPI,
