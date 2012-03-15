@@ -344,6 +344,66 @@ cordova.PluginManager = (function (webworksPluginManager) {
 
             }
         },
+        geolocationAPI = {
+            execute: function (webWorksResult, action, args, win, fail) {
+                var id = args[0];
+                switch (action) {
+                    case 'getAcceleration':
+
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                navigator._geo.listeners[id].success(new Coordinates
+                                   (position.latitude,
+                                    position.longitude,
+                                    position.accuracy,
+                                    position.altitude,
+                                    position.heading,
+                                    position.speed,
+                                    position.altitudeAccuracy));
+                            },
+                            function(error) {
+                                navigator._geo.listeners[id].fail(error);
+                            }
+                        );
+                        return retAsyncCall;
+                    case 'watchPosition':
+                        var  maximumAge = args[1],
+                            timeout = args[2],
+                            enableHighAccuracy = args[3];
+
+                        _cordovaGeoWatchID = navigator.geolocation.watchPosition(
+                            //OnSuccess
+                            function(position){
+                                navigator._geo.listeners[id].success(new Coordinates
+                                    (position.latitude,
+                                        position.longitude,
+                                        position.accuracy,
+                                        position.altitude,
+                                        position.heading,
+                                        position.speed,
+                                        position.altitudeAccuracy));
+
+                        },  //OnError
+                            function(error){
+                                navigator._geo.listeners[id].fail(error);
+
+                        }, //Options
+                            {
+                                maximumAge: maximumAge,
+                                timeout: timeout,
+                                enableHighAccuracy: enableHighAccuracy
+                            }
+                        );
+
+                        return retAsyncCall;
+                    case 'stop':
+                        navigator.geolocation.clearWatch(id);
+                        return retAsyncCall;
+                }
+                return retInvalidAction;
+
+            }
+        },
 
         plugins = {
             'Camera' : cameraAPI,
