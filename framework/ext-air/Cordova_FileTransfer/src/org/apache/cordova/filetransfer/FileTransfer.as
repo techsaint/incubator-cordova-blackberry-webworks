@@ -20,31 +20,43 @@
  */
 
 
-package org.apache.cordova.network {
+package org.apache.cordova.filetransfer {
     import flash.net.NetworkInfo;
     import flash.net.NetworkInterface;
 	import flash.events.Event;
 
     import webworks.extension.DefaultExtension;
 
-    public class Network extends DefaultExtension{
+    public class FileTransfer extends DefaultExtension{
 
         private var _jsFunctionCallbackIDs:Array = [];
 		private const FEATURE_ID:Array = [ "org.apache.cordova" ];
 
-		public function Network() {
+		public function FileTransfer() {
 			//Attach event listener once only
-			NetworkInfo.networkInfo.addEventListener(flash.events.Event.NETWORK_CHANGE, networkChange);
+            var req:URLRequest = new URLRequest(url);
+            stream = new URLStream();
+            stream.addEventListener(Event.COMPLETE, writeAirFile);
+            stream.load(req);
 		}
 
 		override public function getFeatureList():Array {
 			return FEATURE_ID;
 		}
 
-        public function getConnectionInfo(param:String):void{
+        public function download(param:String):void{
 			if(_jsFunctionCallbackIDs.indexOf(param) < 0){
 				_jsFunctionCallbackIDs.push(param);
 			}
+        }
+        private function writeAirFile(evt:Event):void {
+            var data:ByteArray = new ByteArray();
+            stream.readBytes(fileData,0,stream.bytesAvailable);
+            var file:File = File.documentsDirectory.resolvePath("bla.pdf");
+            var fileStream:FileStream = new FileStream();
+            fileStream.open(file, FileMode.WRITE);
+            fileStream.writeBytes(fileData,0,fileData.length);
+            fileStream.close();
         }
 
         private function networkChange( event: Event ) : void {

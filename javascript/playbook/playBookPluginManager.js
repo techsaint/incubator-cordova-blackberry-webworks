@@ -353,13 +353,13 @@ cordova.PluginManager = (function (webworksPluginManager) {
                         navigator.geolocation.getCurrentPosition(
                             function(position) {
                                 navigator._geo.listeners[id].success(new Coordinates
-                                   (position.latitude,
-                                    position.longitude,
-                                    position.accuracy,
-                                    position.altitude,
-                                    position.heading,
-                                    position.speed,
-                                    position.altitudeAccuracy));
+                                    (position.latitude,
+                                        position.longitude,
+                                        position.accuracy,
+                                        position.altitude,
+                                        position.heading,
+                                        position.speed,
+                                        position.altitudeAccuracy));
                             },
                             function(error) {
                                 navigator._geo.listeners[id].fail(error);
@@ -383,11 +383,11 @@ cordova.PluginManager = (function (webworksPluginManager) {
                                         position.speed,
                                         position.altitudeAccuracy));
 
-                        },  //OnError
+                            },  //OnError
                             function(error){
                                 navigator._geo.listeners[id].fail(error);
 
-                        }, //Options
+                            }, //Options
                             {
                                 maximumAge: maximumAge,
                                 timeout: timeout,
@@ -398,6 +398,28 @@ cordova.PluginManager = (function (webworksPluginManager) {
                         return retAsyncCall;
                     case 'stop':
                         navigator.geolocation.clearWatch(id);
+                        return retAsyncCall;
+                }
+                return retInvalidAction;
+
+            }
+        },
+        fileTransferAPI = {
+            execute: function (webWorksResult, action, args, win, fail) {
+                var id = args[0];
+                switch (action) {
+                    case 'download':
+//                        Cordova.exec(castSuccess, errorCallback, 'FileTransfer',
+//                            'download', [ source, target ]);
+
+                        return retAsyncCall;
+                    case 'upload':
+//                        Cordova.exec(successCallback, errorCallback, 'FileTransfer', 'upload',
+//                            [ filePath, server, fileKey, fileName, mimeType, params, debug,
+//                                chunkedMode ]);
+
+                        return retAsyncCall;
+                    case 'stop':
                         return retAsyncCall;
                 }
                 return retInvalidAction;
